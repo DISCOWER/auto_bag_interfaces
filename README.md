@@ -22,16 +22,19 @@ Response:
 
 Your input YAML file should look like this:
 
+```python
 topics:
   - /topic/one
   - /topic/two
   - /topic/three
-
+```
 ────────────────────────────────────────────────────────────────────
 
 3. Python Client Example
 
 ```python
+#call_record_service.py
+
 import rclpy
 from rclpy.node import Node
 from auto_bag_interfaces.srv import RecordTopics
@@ -87,9 +90,10 @@ if __name__ == '__main__':
 
 4. How to Run
 
-source install/setup.bash
-python3 your_client_script.py
-
+```bash
+ros2 run your_package call_record_service.py start topics.yaml  # to start recording
+ros2 run your_package call_record_service.py stop topics.yaml   # to stop recording
+```
 ────────────────────────────────────────────────────────────────────
 
 5. Notes
