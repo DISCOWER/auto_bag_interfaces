@@ -31,54 +31,57 @@ topics:
 
 3. Python Client Example
 
+```python
 import rclpy
 from rclpy.node import Node
 from auto_bag_interfaces.srv import RecordTopics
 import yaml
 
 class RecordClient(Node):
-    def __init__(self):
-        super().__init__('record_client')
-        self.cli = self.create_client(RecordTopics, 'record_topics')
-        while not self.cli.wait_for_service(timeout_sec=2.0):
-            self.get_logger().info('Waiting for service...')
-        self.req = RecordTopics.Request()
+	def __init__(self):
+		super().__init__('record_client')
+		self.cli = self.create_client(RecordTopics, 'record_topics')
+		while not self.cli.wait_for_service(timeout_sec=2.0):
+			self.get_logger().info('Waiting for service...')
+		self.req = RecordTopics.Request()
 
-    def send_request(self, command: str, yaml_path: str):
-        try:
-            with open(yaml_path, 'r') as f:
-                data = yaml.safe_load(f)
-                topics = data.get('topics', [])
-                if not topics:
-                    self.get_logger().error("No topics found in YAML file.")
-                    return
-                self.req.command = command
-                self.req.topics = topics
-        except Exception as e:
-            self.get_logger().error(f"Failed to load YAML: {e}")
-            return
+	def send_request(self, command: str, yaml_path: str):
+		try:
+			with open(yaml_path, 'r') as f:
+				data = yaml.safe_load(f)
+				topics = data.get('topics', [])
+				if not topics:
+					self.get_logger().error("No topics found in YAML file.")
+					return
+				self.req.command = command
+				self.req.topics = topics
+		except Exception as e:
+			self.get_logger().error(f"Failed to load YAML: {e}")
+			return
 
-        future = self.cli.call_async(self.req)
-        rclpy.spin_until_future_complete(self, future)
-        if future.result():
-            self.get_logger().info(f"Server response: {future.result().message}")
-        else:
-            self.get_logger().error("Service call failed.")
+		future = self.cli.call_async(self.req)
+		rclpy.spin_until_future_complete(self, future)
+		if future.result():
+			self.get_logger().info(f"Server response: {future.result().message}")
+		else:
+			self.get_logger().error("Service call failed.")
 
 def main():
-    rclpy.init()
-    node = RecordClient()
+	rclpy.init()
+	node = RecordClient()
 
-    # Modify these values
-    command = "start"  # or "stop"
-    yaml_path = "path/to/topics.yaml"
+	# Modify these values
+	command = "start"  # or "stop"
+	yaml_path = "path/to/topics.yaml"
 
-    node.send_request(command, yaml_path)
-    node.destroy_node()
-    rclpy.shutdown()
+	node.send_request(command, yaml_path)
+	node.destroy_node()
+	rclpy.shutdown()
 
 if __name__ == '__main__':
-    main()
+	main()
+```
+
 
 ────────────────────────────────────────────────────────────────────
 
