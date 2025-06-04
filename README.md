@@ -1,49 +1,98 @@
-# User Package – auto_bag_interfaces
+"""
+README – auto_bag_interfaces (Client Usage Guide)
 
-This package is used on the **client side** to interact with the MoCap PC **server** via the `RecordTopics` service.
+This package provides the service definition for communicating with the auto_bag server,
+which records a list of ROS 2 topics into bag files.
 
-The server is responsible for recording ROS 2 topics into a bag file, based on a YAML configuration string sent by the client.
+────────────────────────────────────────────────────────────────────
 
----
+1. Service Definition: RecordTopics.srv
 
-# Full working client example
+Request:
+    string command         # "start" or "stop"
+    string[] topics        # List of topics to record
 
-    import rclpy
-    from rclpy.node import Node
-    from auto_bag_interfaces.srv import RecordTopics
-    import yaml
+Response:
+    bool success
+    string message
 
-    class RecordTopicsClient(Node):
-        def __init__(self):
-            super().__init__('record_topics_client')
-            self.cli = self.create_client(RecordTopics, '/record_topics')
-            while not self.cli.wait_for_service(timeout_sec=1.0):
-                self.get_logger().info('Waiting for service...')
-            self.req = RecordTopics.Request()
+────────────────────────────────────────────────────────────────────
 
-        def send_request(self, yaml_file_path):
+2. YAML Format Example
 
+Your input YAML file should look like this:
 
+topics:
+  - /topic/one
+  - /topic/two
+  - /topic/three
 
-            with open(yaml_file_path, 'r') as f:
-                yaml_dict = yaml.safe_load(f)
-                yaml_str = yaml.dump(yaml_dict)
+────────────────────────────────────────────────────────────────────
 
-            self.req.yaml_text = yaml_str
-            future = self.cli.call_async(self.req)
-            rclpy.spin_until_future_complete(self, future)
+3. Python Client Example
 
-            if future.result() is not None:
-                self.get_logger().info(f"Response: success={future.result().success}, message='{future.result().message}'")
-            else:
-                self.get_logger().error("Service call failed.")
+import rclpy
+from rclpy.node import Node
+from auto_bag_interfaces.srv import RecordTopics
+import yaml
 
-    def main():
-        rclpy.init()
-        client = RecordTopicsClient()
-        client.send_request('path/to/topics.yaml')  # Replace with actual path
-        client.destroy_node()
-        rclpy.shutdown()
+class RecordClient(Node):
+    def __init__(self):
+        super().__init__('record_client')
+        self.cli = self.create_client(RecordTopics, 'record_topics')
+        while not self.cli.wait_for_service(timeout_sec=2.0):
+            self.get_logger().info('Waiting for service...')
+        self.req = RecordTopics.Request()
 
-    if __name__ == '__main__':
-        main()
+    def send_request(self, command: str, yaml_path: str):
+        try:
+            with open(yaml_path, 'r') as f:
+                data = yaml.safe_load(f)
+                topics = data.get('topics', [])
+                if not topics:
+                    self.get_logger().error("No topics found in YAML file.")
+                    return
+                self.req.command = command
+                self.req.topics = topics
+        except Exception as e:
+            self.get_logger().error(f"Failed to load YAML: {e}")
+            return
+
+        future = self.cli.call_async(self.req)
+        rclpy.spin_until_future_complete(self, future)
+        if future.result():
+            self.get_logger().info(f"Server response: {future.result().message}")
+        else:
+            self.get_logger().error("Service call failed.")
+
+def main():
+    rclpy.init()
+    node = RecordClient()
+
+    # Modify these values
+    command = "start"  # or "stop"
+    yaml_path = "path/to/topics.yaml"
+
+    node.send_request(command, yaml_path)
+    node.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+
+────────────────────────────────────────────────────────────────────
+
+4. How to Run
+
+source install/setup.bash
+python3 your_client_script.py
+
+────────────────────────────────────────────────────────────────────
+
+5. Notes
+
+- Make sure the auto_bag server is running before you launch this script.
+- This interface package only provides the service definition.
+  The actual server behavior is handled by the auto_bag package.
+"""
+
