@@ -35,6 +35,7 @@ topics:
 ```python
 #call_record_service.py
 
+import sys
 import rclpy
 from rclpy.node import Node
 from auto_bag_interfaces.srv import RecordTopics
@@ -70,19 +71,22 @@ class RecordClient(Node):
 			self.get_logger().error("Service call failed.")
 
 def main():
+	if len(sys.argv) != 3:
+		print("Usage: ros2 run your_package call_record_service.py <start|stop> <topics.yaml>")
+		sys.exit(1)
+
+	command = sys.argv[1]
+	yaml_path = sys.argv[2]
+
 	rclpy.init()
 	node = RecordClient()
-
-	# Modify these values
-	command = "start"  # or "stop"
-	yaml_path = "path/to/topics.yaml"
-
 	node.send_request(command, yaml_path)
 	node.destroy_node()
 	rclpy.shutdown()
 
 if __name__ == '__main__':
 	main()
+
 ```
 
 
