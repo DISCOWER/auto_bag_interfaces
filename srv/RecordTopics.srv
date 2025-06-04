@@ -1,5 +1,5 @@
-string command
-string[] topics
+#string command
+string yaml_text
 ---
 bool success
 string message
