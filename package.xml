@@ -2,17 +2,25 @@
 <package format="3">
   <name>auto_bag_interfaces</name>
   <version>0.0.1</version>
-  <description>Service definitions for auto_bag</description>
+  <description>Service definitions and client example for auto_bag</description>
   <maintainer email="emilienghazal@gmail.com">Emilien Ghazal</maintainer>
   <license>Apache-2.0</license>
 
+  <!-- Build tools -->
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <!-- Dependencies for the service generation -->
   <build_depend>rosidl_default_generators</build_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
+
+  <!-- Python execution dependencies -->
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>pyyaml</exec_depend>
 
   <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
-    <build_type>ament_cmake</build_type>
   </export>
 </package>
+
