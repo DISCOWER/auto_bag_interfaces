@@ -72,7 +72,7 @@ class RecordClient(Node):
 
 def main():
 	if len(sys.argv) != 3:
-		print("Usage: ros2 run your_package call_record_service.py <start|stop> <topics.yaml>")
+		print("Usage: ros2 run your_package client_bag <start|stop> <path_to_topics.yaml>")
 		sys.exit(1)
 
 	command = sys.argv[1]
@@ -94,9 +94,15 @@ if __name__ == '__main__':
 
 4. How to Run
 
+i) Create your own python package.
+ii) Copy paste the code above in the package, call it client_bag.py
+iii) Setup properly the setup.py and package.xml.
+iv) After building and sourcing your ws, run :
+
+
 ```bash
-ros2 run your_package call_record_service.py start topics.yaml  # to start recording
-ros2 run your_package call_record_service.py stop topics.yaml   # to stop recording
+ros2 run your_package client_bag start path_to_topics.yaml  # to start recording
+ros2 run your_package client_bag stop path_to_topics.yaml   # to stop recording
 ```
 ────────────────────────────────────────────────────────────────────
 
