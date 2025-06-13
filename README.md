@@ -101,10 +101,12 @@ iv) After building and sourcing your ws, run :
 
 
 ```bash
-ros2 run your_package client_bag start path_to_topics.yaml  # to start recording
-ros2 run your_package client_bag stop path_to_topics.yaml   # to stop recording
+ros2 run your_package client_bag start <path_to_topics.yaml>  # to start recording
+ros2 run your_package client_bag stop <path_to_topics.yaml>   # to stop recording
 ```
 ────────────────────────────────────────────────────────────────────
+
+usually the path to the topics.yaml file should be src/your_package/config/topics.yaml
 
 5. Notes
 
